@@ -1,0 +1,41 @@
+name: django-ecs
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+  
+      - name: Set Up  Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+  
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+  
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: mh3769
+          password: dckr_pat_psSd55_iVYzb59HnJa8YmORKvBs
+  
+      - name: build and release to DockerHub
+        env:
+          NAME: mh3769
+          REPO: docker-ecs
+        run: |
+          docker build -t $REPO .
+          docker tag $REPO:latest $NAME/$REPO:latest
+          docker push $NAME/$REPO:latest
